@@ -4,7 +4,7 @@ import { SubjectService } from "../services/subject.service";
 import { TestService } from "../services/test.service";
 import { TakeTestService } from "../services/take-test.service";
 import { ResultService } from "../services/result.service";
-import { ResponseHelper } from "../utils/response";
+import { success, error } from "../utils/response";
 
 interface AuthRequest extends Request {
   user?: { id: number; username: string; usertype: string };
@@ -17,24 +17,24 @@ export class UserController {
     private readonly testService: TestService,
     private readonly takeTestService: TakeTestService,
     private readonly resultService: ResultService
-  ) {}
+  ) { }
 
   getDetails = (req: AuthRequest, res: Response) => {
     if (req.user) {
-      ResponseHelper.success(res, {
+      success(res, {
         username: req.user.username,
         type: req.user.usertype,
         _id: req.user.id,
       });
     } else {
-      ResponseHelper.error(res, "Not authenticated", 401);
+      error(res, "Not authenticated", 401);
     }
   };
 
   getAllTest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const testlist = await this.testService.getAllTests();
-      ResponseHelper.success(res, { testlist });
+      success(res, { testlist });
     } catch (err) {
       next(err);
     }
@@ -46,7 +46,7 @@ export class UserController {
         req.body.testid,
         req.user?.usertype || ""
       );
-      ResponseHelper.success(res, { test });
+      success(res, { test });
     } catch (err) {
       next(err);
     }
@@ -56,7 +56,7 @@ export class UserController {
   addQuestion = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.questionService.addQuestion({
@@ -68,7 +68,7 @@ export class UserController {
         marks: req.body.marks,
         createdBy: req.user.id,
       });
-      ResponseHelper.success(res, null, "Question created successfully!");
+      success(res, null, "Question created successfully!");
     } catch (err) {
       next(err);
     }
@@ -77,7 +77,7 @@ export class UserController {
   getAllSubjects = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const subjects = await this.subjectService.getActiveSubjects();
-      ResponseHelper.success(res, { subjects });
+      success(res, { subjects });
     } catch (err) {
       next(err);
     }
@@ -86,11 +86,11 @@ export class UserController {
   searchQuestion = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const list = await this.questionService.searchQuestions(req.body.query);
-      ResponseHelper.success(res, { list });
+      success(res, { list });
     } catch (err) {
       next(err);
     }
@@ -99,7 +99,7 @@ export class UserController {
   updateQuestion = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.questionService.updateQuestion(req.body.id, {
@@ -111,7 +111,7 @@ export class UserController {
         marks: req.body.marks,
         createdBy: req.user.id,
       });
-      ResponseHelper.success(res, null, "Question updated");
+      success(res, null, "Question updated");
     } catch (err) {
       next(err);
     }
@@ -120,7 +120,7 @@ export class UserController {
   changeQuestionStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.questionService.changeStatus(
@@ -128,7 +128,7 @@ export class UserController {
         req.body.status,
         req.user.id
       );
-      ResponseHelper.success(res, null, "Status changed");
+      success(res, null, "Status changed");
     } catch (err) {
       next(err);
     }
@@ -137,11 +137,11 @@ export class UserController {
   getAnswer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const result = await this.questionService.getAnswerByQuestionId(req.body.id);
-      ResponseHelper.success(res, result);
+      success(res, result);
     } catch (err) {
       next(err);
     }
@@ -150,11 +150,11 @@ export class UserController {
   getQuestionAnswer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const question = await this.questionService.getQuestionById(req.body.id);
-      ResponseHelper.success(res, { question, answer: question.answer });
+      success(res, { question, answer: question.answer });
     } catch (err) {
       next(err);
     }
@@ -163,7 +163,7 @@ export class UserController {
   createTest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "TEACHER") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.testService.createTest({
@@ -179,7 +179,7 @@ export class UserController {
         resultTime: req.body.resultTime,
         createdBy: req.user.id,
       });
-      ResponseHelper.success(res, null, "Test created successfully!");
+      success(res, null, "Test created successfully!");
     } catch (err) {
       next(err);
     }
@@ -189,11 +189,11 @@ export class UserController {
   testRegistration = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.testService.testRegistration(req.user.id, req.body.testid);
-      ResponseHelper.success(res, null, "Test Registration success");
+      success(res, null, "Test Registration success");
     } catch (err) {
       next(err);
     }
@@ -202,11 +202,11 @@ export class UserController {
   getAllTestStudent = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const testlist = await this.testService.getAllTestsWithRegistrationCheck(req.user.id);
-      ResponseHelper.success(res, { testlist });
+      success(res, { testlist });
     } catch (err) {
       next(err);
     }
@@ -215,11 +215,11 @@ export class UserController {
   getUpcomingTests = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const upcomingtestlist = await this.testService.getUpcomingTests(req.user.id);
-      ResponseHelper.success(res, { upcomingtestlist });
+      success(res, { upcomingtestlist });
     } catch (err) {
       next(err);
     }
@@ -228,11 +228,11 @@ export class UserController {
   startTest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const result = await this.takeTestService.startTest(req.user.id, req.body.testid);
-      ResponseHelper.success(res, result);
+      success(res, result);
     } catch (err) {
       next(err);
     }
@@ -241,7 +241,7 @@ export class UserController {
   getQuestionStartTime = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const result = await this.takeTestService.getQuestionsWithStartTime(
@@ -250,7 +250,7 @@ export class UserController {
         req.body.questionid,
         req.body.addStartTime
       );
-      ResponseHelper.success(res, result);
+      success(res, result);
     } catch (err) {
       next(err);
     }
@@ -259,7 +259,7 @@ export class UserController {
   saveAnswer = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const result = await this.takeTestService.saveAnswer(
@@ -267,7 +267,7 @@ export class UserController {
         req.body.answersheetid,
         req.body.answers
       );
-      ResponseHelper.success(res, {
+      success(res, {
         testDone: result.testDone,
       }, result.testDone ? "Test is completed" : "answers updated");
     } catch (err) {
@@ -278,7 +278,7 @@ export class UserController {
   endTest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       await this.takeTestService.endTest(
@@ -286,7 +286,7 @@ export class UserController {
         req.body.answersheetid,
         req.body.answers
       );
-      ResponseHelper.success(res, null, "Test is completed");
+      success(res, null, "Test is completed");
     } catch (err) {
       next(err);
     }
@@ -295,11 +295,11 @@ export class UserController {
   getAllCompletedTest = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const completedtestlist = await this.resultService.getCompletedTests(req.user.id);
-      ResponseHelper.success(res, { completedtestlist });
+      success(res, { completedtestlist });
     } catch (err) {
       next(err);
     }
@@ -308,7 +308,7 @@ export class UserController {
   getResultDetails = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user || req.user.usertype !== "STUDENT") {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Answer sheet not found", 404);
         return;
       }
       const result = await this.resultService.getResultDetails(
@@ -316,10 +316,10 @@ export class UserController {
         req.body.testid
       );
       if (!result) {
-        ResponseHelper.error(res, "Answer sheet not found", 404);
+        error(res, "Answer sheet not found", 404);
         return;
       }
-      ResponseHelper.success(res, { result });
+      success(res, { result });
     } catch (err) {
       next(err);
     }
@@ -328,11 +328,11 @@ export class UserController {
   getQuestionAnswerByIds = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       if (!req.user) {
-        ResponseHelper.error(res, "Permissions not granted!", 401);
+        error(res, "Permissions not granted!", 401);
         return;
       }
       const questions = await this.questionService.getQuestionsByIds(req.body.queids);
-      ResponseHelper.success(res, { questions });
+      success(res, { questions });
     } catch (err) {
       next(err);
     }

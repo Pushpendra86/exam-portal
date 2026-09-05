@@ -3,18 +3,14 @@ import { PublicController } from "../controllers/public.controller";
 import { validate } from "../middlewares/validation.middleware";
 import { registerStudentSchema } from "../validators/auth.validator";
 
-export class PublicRoutes {
-  public router = Router();
+export const publicRoutes = (publicController: PublicController) => {
+  const router = Router();
 
-  constructor(private readonly publicController: PublicController) {
-    this.routes();
-  }
+  router.post(
+    "/register",
+    validate(registerStudentSchema),
+    publicController.registerStudent
+  );
 
-  private routes() {
-    this.router.post(
-      "/register",
-      validate(registerStudentSchema),
-      this.publicController.registerStudent
-    );
-  }
-}
+  return router;
+};

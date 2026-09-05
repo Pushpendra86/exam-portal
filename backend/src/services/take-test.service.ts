@@ -3,8 +3,8 @@ import { AnswerSheetRepository } from "../repositories/answer-sheet.repository";
 import { TestRegistrationRepository } from "../repositories/test-registration.repository";
 import { QuestionRepository } from "../repositories/question.repository";
 import { TestService } from "./test.service";
-import { TestStatus } from "../models";
-import { AppError } from "../utils/app-error";
+import { TestStatus } from "../entities";
+import { AppError } from "../errors/app-error";
 
 export class TakeTestService {
   constructor(
@@ -13,7 +13,7 @@ export class TakeTestService {
     private readonly testRegistrationRepository: TestRegistrationRepository,
     private readonly questionRepository: QuestionRepository,
     private readonly testService: TestService
-  ) {}
+  ) { }
 
   private getAttemptEndTime(test: { duration: number; end_time: Date }, startAttemptTime: Date): Date {
     const regularEndTime = new Date(Date.parse(String(startAttemptTime)) + test.duration * 1000);

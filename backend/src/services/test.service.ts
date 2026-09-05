@@ -1,15 +1,15 @@
 import { TestRepository } from "../repositories/test.repository";
 import { QuestionRepository } from "../repositories/question.repository";
 import { TestRegistrationRepository } from "../repositories/test-registration.repository";
-import { TestStatus } from "../models";
-import { AppError } from "../utils/app-error";
+import { TestStatus } from "../entities";
+import { AppError } from "../errors/app-error";
 
 export class TestService {
   constructor(
     private readonly testRepository: TestRepository,
     private readonly questionRepository: QuestionRepository,
     private readonly testRegistrationRepository: TestRegistrationRepository
-  ) {}
+  ) { }
 
   getTestStatus(test: {
     status: string;

@@ -1,8 +1,8 @@
 import { UserRepository } from "../repositories/user.repository";
-import { UserType } from "../models";
+import { UserType } from "../entities";
 
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: UserRepository) { }
 
   async getAllTeachers() {
     const teachers = await this.userRepository.findByType(UserType.TEACHER);

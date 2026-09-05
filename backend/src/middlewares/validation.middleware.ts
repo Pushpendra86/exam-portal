@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { z, ZodError } from "zod";
-import { ResponseHelper } from "../utils/response";
+import { error } from "../utils/response";
 
 type ZodSchema = z.ZodType;
 
@@ -46,7 +46,7 @@ export const validate = (schemas: ZodSchema | ValidationSchemas) => {
           field: issue.path.join("."),
           message: issue.message,
         }));
-        ResponseHelper.error(res, "Validation failed", 400, errors);
+        error(res, "Validation failed", 400, errors);
         return;
       }
       next(err);

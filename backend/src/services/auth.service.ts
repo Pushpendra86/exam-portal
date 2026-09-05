@@ -3,14 +3,14 @@ import jwt from "jsonwebtoken";
 import { config } from "../config";
 import { AdminRepository } from "../repositories/admin.repository";
 import { UserRepository } from "../repositories/user.repository";
-import { Admin, User } from "../models";
-import { AppError } from "../utils/app-error";
+import { Admin, User } from "../entities";
+import { AppError } from "../errors/app-error";
 
 export class AuthService {
   constructor(
     private readonly adminRepository: AdminRepository,
     private readonly userRepository: UserRepository
-  ) {}
+  ) { }
 
   async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, config.BCRYPT_SALT_ROUNDS);

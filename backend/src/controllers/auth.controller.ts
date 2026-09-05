@@ -1,17 +1,17 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../services/auth.service";
-import { ResponseHelper } from "../utils/response";
-import { AppError } from "../utils/app-error";
+import { success } from "../utils/response";
+import { AppError } from "../errors/app-error";
 
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   adminLogin = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { username, password } = req.body;
       const admin = await this.authService.validateAdmin(username, password);
       const token = this.authService.generateToken({ _id: admin.id });
-      ResponseHelper.success(res, {
+      success(res, {
         admin: { username: admin.username, _id: admin.id },
         token,
       }, "login successful");
@@ -25,7 +25,7 @@ export class AuthController {
       const { email, password } = req.body;
       const user = await this.authService.validateUser(email, password);
       const token = this.authService.generateToken({ _id: user.id });
-      ResponseHelper.success(res, {
+      success(res, {
         user: {
           username: user.username,
           type: user.usertype,
