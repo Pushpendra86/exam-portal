@@ -1,17 +1,17 @@
 import { DataSource } from "typeorm";
 import { config } from "./index";
-import { Admin } from "../models/admin.model";
-import { User } from "../models/user.model";
-import { Subject } from "../models/subject.model";
-import { Question } from "../models/question.model";
-import { Test } from "../models/test.model";
-import { TestRegistration } from "../models/test-registration.model";
-import { AnswerSheet } from "../models/answer-sheet.model";
+import { Admin } from "../entities/admin.entity";
+import { User } from "../entities/user.entity";
+import { Subject } from "../entities/subject.entity";
+import { Question } from "../entities/question.entity";
+import { Test } from "../entities/test.entity";
+import { TestRegistration } from "../entities/test-registration.entity";
+import { AnswerSheet } from "../entities/answer-sheet.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: config.PG_CONNECTION_STRING,
-  synchronize: true,
+  synchronize: config.NODE_ENV !== "production",
   logging: config.NODE_ENV === "development",
   entities: [Admin, User, Subject, Question, Test, TestRegistration, AnswerSheet],
 });

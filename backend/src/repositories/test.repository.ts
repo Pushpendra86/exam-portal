@@ -1,11 +1,11 @@
-import { AppDataSource } from "../config/database";
-import { Test, TestStatus } from "../models/test.model";
-
-const repo = () => AppDataSource.getRepository(Test);
+import { Repository } from "typeorm";
+import { Test, TestStatus } from "../entities/test.entity";
 
 export class TestRepository {
+  constructor(private readonly repository: Repository<Test>) { }
+
   async findById(id: number): Promise<Test | null> {
-    return repo().findOneBy({ id });
+    return this.repository.findOneBy({ id });
   }
 
   async createTest(data: {
@@ -23,7 +23,7 @@ export class TestRepository {
     result_time: string;
     created_by: number;
   }): Promise<Test> {
-    const test = repo().create({
+    const test = this.repository.create({
       title: data.title,
       subjects: data.subjects,
       questions: data.questions,
@@ -38,19 +38,19 @@ export class TestRepository {
       result_time: new Date(data.result_time),
       created_by: data.created_by,
     });
-    return repo().save(test);
+    return this.repository.save(test);
   }
 
   async findAllOrdered(): Promise<Test[]> {
-    return repo().find({ order: { start_time: "DESC" } });
+    return this.repository.find({ order: { start_time: "DESC" } });
   }
 
   async findAllOrderedAsc(): Promise<Test[]> {
-    return repo().find({ order: { start_time: "ASC" } });
+    return this.repository.find({ order: { start_time: "ASC" } });
   }
 
   async findUpcoming(): Promise<Test[]> {
-    return repo()
+    return this.repository
       .createQueryBuilder("t")
       .where("t.end_time > :now", { now: new Date() })
       .orderBy("t.start_time", "ASC")
@@ -58,11 +58,11 @@ export class TestRepository {
   }
 
   async updateStatus(id: number, status: TestStatus): Promise<boolean> {
-    const result = await repo().update(id, { status });
+    const result = await this.repository.update(id, { status });
     return (result.affected ?? 0) > 0;
   }
 
   async findByIds(ids: number[]): Promise<Test[]> {
-    return repo().findBy(ids.map((id) => ({ id })));
+    return this.repository.findBy(ids.map((id) => ({ id })));
   }
 }

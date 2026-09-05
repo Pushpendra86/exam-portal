@@ -1,12 +1,12 @@
 import { QuestionRepository } from "../repositories/question.repository";
 import { SubjectRepository } from "../repositories/subject.repository";
-import { AppError } from "../utils/app-error";
+import { AppError } from "../errors/app-error";
 
 export class QuestionService {
   constructor(
     private readonly questionRepository: QuestionRepository,
     private readonly subjectRepository: SubjectRepository
-  ) {}
+  ) { }
 
   async addQuestion(data: {
     body: string;
@@ -112,13 +112,13 @@ export class QuestionService {
       const q = questions.find((ques) => ques.id === id);
       return q
         ? {
-            _id: q.id,
-            body: q.body,
-            options: q.options,
-            marks: q.marks,
-            answer: q.answer,
-            explanation: q.explanation,
-          }
+          _id: q.id,
+          body: q.body,
+          options: q.options,
+          marks: q.marks,
+          answer: q.answer,
+          explanation: q.explanation,
+        }
         : null;
     }).filter(Boolean);
     return ordered;

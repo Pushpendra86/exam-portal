@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UserController } from "../controllers/user.controller";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import type { AuthMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import { registerStudentSchema } from "../validators/auth.validator";
 import {
@@ -21,104 +21,100 @@ import {
   endTestSchema,
 } from "../validators/test.validator";
 
-export class UserRoutes {
-  public router = Router();
+export const userRoutes = (
+  userController: UserController,
+  authMiddleware: AuthMiddleware
+) => {
+  const router = Router();
 
-  constructor(
-    private readonly userController: UserController,
-    private readonly authMiddleware: AuthMiddleware
-  ) {
-    this.routes();
-  }
+  router.use(authMiddleware.authenticateUser);
 
-  private routes() {
-    this.router.use(this.authMiddleware.authenticateUser);
+  // Common
+  router.get("/details", userController.getDetails);
 
-    // Common
-    this.router.get("/details", this.userController.getDetails);
+  // Test (common)
+  router.get("/getAllTest", userController.getAllTest);
+  router.post("/getTestById", userController.getTestById);
 
-    // Test (common)
-    this.router.get("/getAllTest", this.userController.getAllTest);
-    this.router.post("/getTestById", this.userController.getTestById);
+  // Teacher endpoints
+  router.post(
+    "/addQuestion",
+    validate(addQuestionSchema),
+    userController.addQuestion
+  );
+  router.get("/getAllSubjects", userController.getAllSubjects);
+  router.post(
+    "/searchQuestion",
+    validate(searchQuestionSchema),
+    userController.searchQuestion
+  );
+  router.post(
+    "/updateQuestion",
+    validate(updateQuestionSchema),
+    userController.updateQuestion
+  );
+  router.post(
+    "/changeQuestionStatus",
+    validate(changeStatusSchema),
+    userController.changeQuestionStatus
+  );
+  router.post(
+    "/getAnswer",
+    validate(questionIdSchema),
+    userController.getAnswer
+  );
+  router.post(
+    "/getQuestionAnswer",
+    validate(questionIdSchema),
+    userController.getQuestionAnswer
+  );
+  router.post(
+    "/createTest",
+    validate(createTestSchema),
+    userController.createTest
+  );
 
-    // Teacher endpoints
-    this.router.post(
-      "/addQuestion",
-      validate(addQuestionSchema),
-      this.userController.addQuestion
-    );
-    this.router.get("/getAllSubjects", this.userController.getAllSubjects);
-    this.router.post(
-      "/searchQuestion",
-      validate(searchQuestionSchema),
-      this.userController.searchQuestion
-    );
-    this.router.post(
-      "/updateQuestion",
-      validate(updateQuestionSchema),
-      this.userController.updateQuestion
-    );
-    this.router.post(
-      "/changeQuestionStatus",
-      validate(changeStatusSchema),
-      this.userController.changeQuestionStatus
-    );
-    this.router.post(
-      "/getAnswer",
-      validate(questionIdSchema),
-      this.userController.getAnswer
-    );
-    this.router.post(
-      "/getQuestionAnswer",
-      validate(questionIdSchema),
-      this.userController.getQuestionAnswer
-    );
-    this.router.post(
-      "/createTest",
-      validate(createTestSchema),
-      this.userController.createTest
-    );
+  // Student endpoints
+  router.post(
+    "/testRegistration",
+    validate(testRegistrationSchema),
+    userController.testRegistration
+  );
+  router.get("/getAllTestStudent", userController.getAllTestStudent);
+  router.get("/getUpcomingTests", userController.getUpcomingTests);
 
-    // Student endpoints
-    this.router.post(
-      "/testRegistration",
-      validate(testRegistrationSchema),
-      this.userController.testRegistration
-    );
-    this.router.get("/getAllTestStudent", this.userController.getAllTestStudent);
-    this.router.get("/getUpcomingTests", this.userController.getUpcomingTests);
+  router.post(
+    "/startTest",
+    validate(startTestSchema),
+    userController.startTest
+  );
+  router.post(
+    "/getQuenStarttime",
+    validate(questionsStartTimeSchema),
+    userController.getQuestionStartTime
+  );
+  router.post(
+    "/saveAnswer",
+    validate(saveAnswerSchema),
+    userController.saveAnswer
+  );
+  router.post(
+    "/endTest",
+    validate(endTestSchema),
+    userController.endTest
+  );
 
-    this.router.post(
-      "/startTest",
-      validate(startTestSchema),
-      this.userController.startTest
-    );
-    this.router.post(
-      "/getQuenStarttime",
-      validate(questionsStartTimeSchema),
-      this.userController.getQuestionStartTime
-    );
-    this.router.post(
-      "/saveAnswer",
-      validate(saveAnswerSchema),
-      this.userController.saveAnswer
-    );
-    this.router.post(
-      "/endTest",
-      validate(endTestSchema),
-      this.userController.endTest
-    );
+  router.get("/getAllCompletedTest", userController.getAllCompletedTest);
+  router.post(
+    "/getResultMainDetailsByTestId",
+    validate(testIdSchema),
+    userController.getResultDetails
+  );
+  router.post(
+    "/getQuestionAnswerByIds",
+    validate(questionIdsSchema),
+    userController.getQuestionAnswerByIds
+  );
 
-    this.router.get("/getAllCompletedTest", this.userController.getAllCompletedTest);
-    this.router.post(
-      "/getResultMainDetailsByTestId",
-      validate(testIdSchema),
-      this.userController.getResultDetails
-    );
-    this.router.post(
-      "/getQuestionAnswerByIds",
-      validate(questionIdsSchema),
-      this.userController.getQuestionAnswerByIds
-    );
-  }
-}
+  return router;
+};

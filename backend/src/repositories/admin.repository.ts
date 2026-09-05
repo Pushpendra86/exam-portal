@@ -1,20 +1,20 @@
-import { AppDataSource } from "../config/database";
-import { Admin } from "../models/admin.model";
-
-const repo = () => AppDataSource.getRepository(Admin);
+import { Repository } from "typeorm";
+import { Admin } from "../entities/admin.entity";
 
 export class AdminRepository {
+  constructor(private readonly repository: Repository<Admin>) { }
+
   async findById(id: number): Promise<Admin | null> {
-    return repo().findOneBy({ id });
+    return this.repository.findOneBy({ id });
   }
 
   async findByUsername(username: string): Promise<Admin | null> {
-    return repo().findOneBy({ username });
+    return this.repository.findOneBy({ username });
   }
 
   async create(data: { username: string; password: string }): Promise<Admin> {
-    const admin = repo().create(data);
-    return repo().save(admin);
+    const admin = this.repository.create(data);
+    return this.repository.save(admin);
   }
 
   async findOrCreateDefaultAdmin(

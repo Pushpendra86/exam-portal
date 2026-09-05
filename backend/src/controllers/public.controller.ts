@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { UserRepository } from "../repositories/user.repository";
 import { AuthService } from "../services/auth.service";
-import { UserType } from "../models";
-import { ResponseHelper } from "../utils/response";
-import { AppError } from "../utils/app-error";
+import { UserType } from "../entities";
+import { success } from "../utils/response";
+import { AppError } from "../errors/app-error";
 
 export class PublicController {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly authService: AuthService
-  ) {}
+  ) { }
 
   registerStudent = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -25,7 +25,7 @@ export class PublicController {
         password: hashedPassword,
         usertype: UserType.STUDENT,
       });
-      ResponseHelper.success(res, null, "Profile created successfully!");
+      success(res, null, "Profile created successfully!");
     } catch (err) {
       next(err);
     }

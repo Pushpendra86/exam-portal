@@ -1,15 +1,15 @@
 import { UserRepository } from "../repositories/user.repository";
 import { SubjectRepository } from "../repositories/subject.repository";
 import { AuthService } from "./auth.service";
-import { AppError } from "../utils/app-error";
-import { UserType } from "../models";
+import { AppError } from "../errors/app-error";
+import { UserType } from "../entities";
 
 export class AdminService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly subjectRepository: SubjectRepository,
     private readonly authService: AuthService
-  ) {}
+  ) { }
 
   async registerTeacher(
     username: string,

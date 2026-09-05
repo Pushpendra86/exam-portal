@@ -12,6 +12,9 @@ class Config {
 
   constructor() {
     this.NODE_ENV = process.env.NODE_ENV || "development";
+    if (this.NODE_ENV === "production" && !process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET must be configured in production");
+    }
     this.PORT = parseInt(process.env.PORT || "5000", 10);
     this.PG_CONNECTION_STRING =
       process.env.PG_CONNECTION_STRING ||

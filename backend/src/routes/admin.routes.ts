@@ -1,42 +1,38 @@
 import { Router } from "express";
 import { AdminController } from "../controllers/admin.controller";
-import { AuthMiddleware } from "../middlewares/auth.middleware";
+import type { AuthMiddleware } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
 import { registerTeacherSchema, addSubjectSchema, idBodySchema } from "../validators/admin.validator";
 
-export class AdminRoutes {
-  public router = Router();
+export const adminRoutes = (
+  adminController: AdminController,
+  authMiddleware: AuthMiddleware
+) => {
+  const router = Router();
 
-  constructor(
-    private readonly adminController: AdminController,
-    private readonly authMiddleware: AuthMiddleware
-  ) {
-    this.routes();
-  }
+  router.use(authMiddleware.authenticateAdmin);
 
-  private routes() {
-    this.router.use(this.authMiddleware.authenticateAdmin);
+  router.get("/details", adminController.getDetails);
+  router.post(
+    "/register",
+    validate(registerTeacherSchema),
+    adminController.registerTeacher
+  );
+  router.post("/removeUser", adminController.removeUser);
+  router.post("/unblockUser", adminController.unblockUser);
+  router.post(
+    "/addSubject",
+    validate(addSubjectSchema),
+    adminController.addSubject
+  );
+  router.post("/removeSubject", adminController.removeSubject);
+  router.post("/unblockSubject", adminController.unblockSubject);
+  router.get("/getDashboardCount", adminController.getDashboardCount);
+  router.get("/getAllSubjects", adminController.getAllSubjects);
+  router.get("/getSubjectCount", adminController.getSubjectCount);
+  router.get("/getAllTeachers", adminController.getAllTeachers);
+  router.get("/getTeacherStatusCount", adminController.getTeacherStatusCount);
+  router.get("/getAllStudent", adminController.getAllStudents);
 
-    this.router.get("/details", this.adminController.getDetails);
-    this.router.post(
-      "/register",
-      validate(registerTeacherSchema),
-      this.adminController.registerTeacher
-    );
-    this.router.post("/removeUser", this.adminController.removeUser);
-    this.router.post("/unblockUser", this.adminController.unblockUser);
-    this.router.post(
-      "/addSubject",
-      validate(addSubjectSchema),
-      this.adminController.addSubject
-    );
-    this.router.post("/removeSubject", this.adminController.removeSubject);
-    this.router.post("/unblockSubject", this.adminController.unblockSubject);
-    this.router.get("/getDashboardCount", this.adminController.getDashboardCount);
-    this.router.get("/getAllSubjects", this.adminController.getAllSubjects);
-    this.router.get("/getSubjectCount", this.adminController.getSubjectCount);
-    this.router.get("/getAllTeachers", this.adminController.getAllTeachers);
-    this.router.get("/getTeacherStatusCount", this.adminController.getTeacherStatusCount);
-    this.router.get("/getAllStudent", this.adminController.getAllStudents);
-  }
-}
+  return router;
+};
